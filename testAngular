@@ -1,0 +1,207 @@
+
+<html>
+
+<head>
+  <title>Form Demo</title>
+  <style>
+    .username.ng-valid {
+      border-color: lightgreen;
+    }
+    
+    .username.ng-dirty.ng-invalid-required {
+      border-color: red;
+    }
+    
+    .username.ng-dirty.ng-invalid-minlength {
+      border-color: yellow;
+    }
+    
+    .email.ng-valid {
+      border-color: lightgreen;
+    }
+    
+    .email.ng-dirty.ng-invalid-required {
+      border-color: red;
+    }
+    
+    .email.ng-dirty.ng-invalid-email {
+      border-color: yellow;
+    }
+  </style>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body ng-app="myApp">
+  <div class="generic-container" ng-controller="AppController as ctrl">
+    <div class="panel panel-default">
+      <div class="panel-heading"><span class="lead">User Registration Form </span></div>
+      <div class="formcontainer" align="center">
+
+        <form ng-submit="ctrl.submit()" name="myForm" class="form-horizontal">
+          <input type="hidden" ng-model="ctrl.user.id" />
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label class="col-md-2 control-lable" for="uname">Name</label>
+              <div class="col-md-7">
+                <input type="text" ng-model="ctrl.user.username" id="uname" class="username form-control input-sm" placeholder="Enter your name" required ng-minlength="3" />
+                <div class="has-error" ng-show="myForm.$dirty">
+                  <span ng-show="myForm.uname.$error.required">This is a required field</span>
+                  <span ng-show="myForm.uname.$error.minlength">Minimum length required is 3</span>
+                  <span ng-show="myForm.uname.$invalid">This field is invalid </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label class="col-md-2 control-lable" for="address">Roles</label>
+              <div ng-controller="AppController" class="col-md-7">
+                <select ng-model="selectedName" ng-options="option for option in names" class="username form-control input-sm" required>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label class="col-md-2 control-lable" for="email">Email</label>
+              <div class="col-md-7">
+                <input type="email" ng-model="ctrl.user.email" id="email" class="email form-control input-sm" placeholder="Enter your Email" required/>
+                <div class="has-error" ng-show="myForm.$dirty">
+                  <span ng-show="myForm.email.$error.required">This is a required field</span>
+                  <span ng-show="myForm.email.$invalid">This field is invalid </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label class="col-md-2 control-lable" for="password">password</label>
+              <div class="col-md-7">
+                <input type="password" ng-model="password" id="password" class="password form-control input-sm" placeholder="Enter your password" required ng-change="analyze(password)" ng-style="passwordStrength" />
+
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label class="col-md-2 control-lable" for="password"> Confirm password</label>
+              <div class="col-md-7">
+                <input id="confirm_password" ng-model="user.ctrl.confirmpassword" name="confirmpassword" type="password" placeholder="confirm password" required password-verify="[[user.ctrl.password]]" class="password form-control input-sm" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-actions floatRight">
+              <input type="submit" value="{{!ctrl.user.id ? 'Add' : 'Update'}}" class="btn btn-primary btn-sm" ng-disabled="myForm.$invalid">
+              <button type="button" ng-click="ctrl.reset()" class="btn btn-warning btn-sm" ng-disabled="myForm.$pristine">Reset Form</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js">
+    </script>
+    <script>
+      var myApp = angular.module('myApp', [])
+        .controller('AppController', ['$scope', function($scope) {
+
+            $scope.names = ["Operations Manager", "Loan Processor", "Loan Officer", "UnderWriter", "CTO"];
+
+            var strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})");
+            var mediumRegex = new RegExp("^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})");
+            $scope.passwordStrength = {
+
+              "ng-model": "password"
+             
+            };
+            $scope.analyze = function(value) {
+              if (strongRegex.test(value)) {
+                $scope.passwordStrength["border-color"] = "lightgreen";
+              } else if (mediumRegex.test(value)) {
+                $scope.passwordStrength["border-color"] = "orange";
+              } else {
+                $scope.passwordStrength["border-color"] = "red";
+              }
+            };
+            $scope.analyze = function(value){
+              if(password==confirmpassword){$scope.passwordstrength["background-color"]="lightgreen"};
+            };
+
+            var self = this;
+            self.user = {
+              id: null,
+              username: '',
+              roles: '',
+              email: ''
+            };
+            self.id = 4;
+
+            self.submit = function() {
+              if (self.user.id === null) {
+                self.user.id = self.id++;
+                console.log('Saving New User', self.user);
+                self.users.push(self.user); //Or send to server, we will do it in when handling services
+              } else {
+                for (var i = 0; i < self.users.length; i++) {
+                  if (self.users[i].id === self.user.id) {
+                    self.users[i] = self.user;
+                    break;
+                  }
+                }
+                console.log('User updated with id ', self.user.id);
+              }
+              self.reset();
+            };
+
+            self.edit = function(id) {
+              console.log('id to be edited', id);
+              for (var i = 0; i < self.users.length; i++) {
+                if (self.users[i].id === id) {
+                  self.user = angular.copy(self.users[i]);
+                  break;
+                }
+              }
+            }
+
+            self.remove = function(id) {
+              console.log('id to be deleted', id);
+              for (var i = 0; i < self.users.length; i++) {
+                if (self.users[i].id === id) {
+                  self.users.splice(i, 1);
+                  if (self.user.id === id) { //It is shown in form, reset it.
+                    self.reset();
+                  }
+                  break;
+                }
+              }
+            }
+
+            self.reset = function() {
+              self.user = {
+                id: null,
+                username: '',
+                address: '',
+                email: '',
+                Role: '',
+                password: '',
+                cnfrmpassword: ''
+              };
+              $scope.myForm.$setPristine(); //reset Form
+            }
+
+          }
+
+
+        ]);
+    </script>
+  </div>
+</body>
+
+</html>
